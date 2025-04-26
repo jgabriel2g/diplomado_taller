@@ -32,16 +32,6 @@ const Carrito = () => {
     setSelectedCupon(cupon);
   };
 
-  const handleUsarCupon = async () => {
-    if (!selectedCupon) return;
-    try {
-      await usarCupon(selectedCupon.id);
-      setSelectedCupon(null);
-    } catch (error) {
-      setError("Error al aplicar el cupón");
-    }
-  };
-
   const calcularSubtotal = () => {
     return carrito.reduce(
       (total, item) => total + item.price * item.cantidad,
@@ -51,7 +41,8 @@ const Carrito = () => {
 
   const calcularDescuento = () => {
     if (!selectedCupon) return 0;
-    return (calcularSubtotal() * selectedCupon.porcentaje) / 100;
+    const subtotal = calcularSubtotal();
+    return (subtotal * selectedCupon.descuento) / 100;
   };
 
   const calcularTotal = () => {
@@ -66,6 +57,11 @@ const Carrito = () => {
     try {
       // Simular proceso de pago
       await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // Si hay un cupón seleccionado, marcarlo como usado
+      if (selectedCupon) {
+        await usarCupon(selectedCupon.id);
+      }
 
       // Guardar la compra en Firebase
       await guardarCompra(carrito, calcularTotal());
@@ -241,14 +237,6 @@ const Carrito = () => {
                           </option>
                         ))}
                       </select>
-                      {selectedCupon && (
-                        <button
-                          onClick={handleUsarCupon}
-                          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
-                        >
-                          Aplicar cupón
-                        </button>
-                      )}
                     </div>
                   </div>
                 )}
@@ -256,7 +244,7 @@ const Carrito = () => {
                 {/* Descuento aplicado */}
                 {selectedCupon && (
                   <div className="flex justify-between text-green-600">
-                    <span>Descuento ({selectedCupon.porcentaje}%)</span>
+                    <span>Descuento ({selectedCupon.descuento}%)</span>
                     <span>-${calcularDescuento().toFixed(2)}</span>
                   </div>
                 )}
