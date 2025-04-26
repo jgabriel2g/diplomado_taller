@@ -622,19 +622,19 @@ const Stock = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Producto
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Precio
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Stock
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Estado
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Acciones
                 </th>
               </tr>
@@ -642,31 +642,31 @@ const Stock = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {productos.map((producto) => (
                 <tr key={producto.docId}>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-3 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="h-10 w-10 flex-shrink-0">
+                      <div className="h-8 w-8 flex-shrink-0">
                         <img
-                          className="h-10 w-10 rounded-full object-contain"
+                          className="h-8 w-8 rounded-full object-contain"
                           src={producto.image}
                           alt={producto.title}
                         />
                       </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
+                      <div className="ml-3">
+                        <div className="text-sm font-medium text-gray-900 truncate max-w-[200px]">
                           {producto.title}
                         </div>
-                        <div className="text-sm text-gray-500">
+                        <div className="text-xs text-gray-500">
                           {producto.category}
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-3 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
                       ${producto.price}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-3 whitespace-nowrap">
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={() =>
@@ -694,7 +694,7 @@ const Stock = () => {
                       </button>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-3 whitespace-nowrap">
                     <div className="flex items-center space-x-2">
                       <input
                         type="checkbox"
@@ -704,14 +704,14 @@ const Stock = () => {
                             destacado: e.target.checked,
                           })
                         }
-                        className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                       />
-                      <span className="text-sm text-gray-500">
+                      <span className="text-xs text-gray-500">
                         {producto.destacado ? "Destacado" : "Normal"}
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
                     <button
                       onClick={() => eliminarProducto(producto.docId)}
                       className="text-red-600 hover:text-red-900"
