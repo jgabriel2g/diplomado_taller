@@ -26,48 +26,45 @@ const Inicio = () => {
 
   const obtenerProductos = async () => {
     try {
+      setLoading(true);
       const productosRef = collection(db, "productos");
 
-      // Obtener productos destacados (los más recientes)
-      const destacadosQuery = query(
+      // Obtener productos destacados
+      const qDestacados = query(
         productosRef,
-        orderBy("fechaCreacion", "desc"),
+        where("destacado", "==", true),
         limit(4)
       );
-      const destacadosSnapshot = await getDocs(destacadosQuery);
-      const destacados = destacadosSnapshot.docs.map((doc) => ({
+      const destacadosSnapshot = await getDocs(qDestacados);
+      const destacadosData = destacadosSnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
-      setProductosDestacados(destacados);
+      setProductosDestacados(destacadosData);
 
-      // Obtener productos en oferta (los que tienen stock > 5)
-      const ofertasQuery = query(
-        productosRef,
-        where("stock", ">", 5),
-        limit(4)
-      );
-      const ofertasSnapshot = await getDocs(ofertasQuery);
-      const ofertas = ofertasSnapshot.docs.map((doc) => ({
+      // Obtener productos en oferta (stock > 5)
+      const qOfertas = query(productosRef, where("stock", ">", 5), limit(4));
+      const ofertasSnapshot = await getDocs(qOfertas);
+      const ofertasData = ofertasSnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
-      setProductosOfertas(ofertas);
+      setProductosOfertas(ofertasData);
 
-      // Obtener productos populares (los que tienen más stock)
-      const popularesQuery = query(
+      // Obtener productos populares (más stock)
+      const qPopulares = query(
         productosRef,
         orderBy("stock", "desc"),
         limit(4)
       );
-      const popularesSnapshot = await getDocs(popularesQuery);
-      const populares = popularesSnapshot.docs.map((doc) => ({
+      const popularesSnapshot = await getDocs(qPopulares);
+      const popularesData = popularesSnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
-      setProductosPopulares(populares);
+      setProductosPopulares(popularesData);
     } catch (error) {
-      console.error("Error al cargar productos:", error);
+      console.error("Error al cargar los productos:", error);
     } finally {
       setLoading(false);
     }
