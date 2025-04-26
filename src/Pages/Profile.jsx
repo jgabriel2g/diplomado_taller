@@ -3,6 +3,7 @@ import { useAuth } from "../Context/AuthContext";
 import { useCompras } from "../Context/ComprasContext";
 import { useCupones } from "../Context/CuponesContext";
 import { updateProfile } from "firebase/auth";
+import { auth } from "../configs/firebase";
 
 const Profile = () => {
   const { user } = useAuth();
@@ -25,12 +26,19 @@ const Profile = () => {
     setSuccess("");
 
     try {
-      await updateProfile(user, {
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        throw new Error("No hay usuario autenticado");
+      }
+
+      await updateProfile(currentUser, {
         displayName: displayName,
       });
+
       setSuccess("Perfil actualizado correctamente");
       setIsEditing(false);
-    } catch {
+    } catch (error) {
+      console.error("Error al actualizar el perfil:", error);
       setError("Error al actualizar el perfil");
     } finally {
       setLoading(false);
@@ -194,16 +202,16 @@ const Profile = () => {
                           <div className="flex justify-between items-start">
                             <div>
                               <p className="font-medium text-gray-900">
-                                {cupon.porcentaje}% de descuento
+                                {cupon.descuento}% de descuento
                               </p>
                               <p className="text-sm text-gray-500">
                                 Código: {cupon.codigo}
                               </p>
                               <p className="text-xs text-gray-400">
                                 Creado el{" "}
-                                {new Date(
-                                  cupon.fechaCreacion
-                                ).toLocaleDateString()}
+                                {cupon.fechaCreacion
+                                  .toDate()
+                                  .toLocaleDateString()}
                               </p>
                             </div>
                             <span

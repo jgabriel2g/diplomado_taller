@@ -13,12 +13,32 @@ const Carrito = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [cuponSeleccionado, setCuponSeleccionado] = useState(null);
+  const [selectedCupon, setSelectedCupon] = useState(null);
 
   const handleCantidadChange = (producto, value) => {
     const newCantidad = producto.cantidad + value;
     if (newCantidad >= 1 && newCantidad <= 3) {
       actualizarCantidad(producto.id, newCantidad);
+    }
+  };
+
+  const handleCuponChange = (e) => {
+    const cuponId = e.target.value;
+    if (cuponId === "") {
+      setSelectedCupon(null);
+      return;
+    }
+    const cupon = cupones.find((c) => c.id === cuponId);
+    setSelectedCupon(cupon);
+  };
+
+  const handleUsarCupon = async () => {
+    if (!selectedCupon) return;
+    try {
+      await usarCupon(selectedCupon.id);
+      setSelectedCupon(null);
+    } catch (error) {
+      setError("Error al aplicar el cupón");
     }
   };
 
@@ -30,33 +50,15 @@ const Carrito = () => {
   };
 
   const calcularDescuento = () => {
-    if (!cuponSeleccionado) return 0;
-    return (calcularSubtotal() * cuponSeleccionado.porcentaje) / 100;
+    if (!selectedCupon) return 0;
+    return (calcularSubtotal() * selectedCupon.porcentaje) / 100;
   };
 
   const calcularTotal = () => {
     return calcularSubtotal() - calcularDescuento();
   };
 
-  const handleAplicarCupon = async (cupon) => {
-    if (cupon.usado) {
-      Swal.fire({
-        title: "Error",
-        text: "Este cupón ya ha sido utilizado",
-        icon: "error",
-        confirmButtonText: "Entendido",
-        confirmButtonColor: "#2563eb",
-      });
-      return;
-    }
-
-    if (cuponSeleccionado?.id === cupon.id) {
-      setCuponSeleccionado(null);
-    } else {
-      setCuponSeleccionado(cupon);
-      await usarCupon(cupon.id);
-    }
-  };
+  const cuponesDisponibles = cupones.filter((cupon) => !cupon.usado);
 
   const handlePagar = async () => {
     setLoading(true);
@@ -70,7 +72,7 @@ const Carrito = () => {
 
       setLoading(false);
       limpiarCarrito();
-      setCuponSeleccionado(null);
+      setSelectedCupon(null);
 
       // Mostrar alerta de éxito con SweetAlert2
       await Swal.fire({
@@ -221,59 +223,40 @@ const Carrito = () => {
                 </div>
 
                 {/* Cupones disponibles */}
-                {cupones.length > 0 && (
+                {cuponesDisponibles.length > 0 && (
                   <div className="border-t border-gray-200 pt-4">
                     <h4 className="text-sm font-medium text-gray-900 mb-2">
                       Cupones disponibles
                     </h4>
                     <div className="space-y-2">
-                      {cupones.map((cupon) => (
-                        <div
-                          key={cupon.id}
-                          className={`flex items-center justify-between p-2 rounded-lg ${
-                            cupon.usado
-                              ? "bg-gray-50"
-                              : "bg-blue-50 hover:bg-blue-100"
-                          }`}
+                      <select
+                        value={selectedCupon?.id || ""}
+                        onChange={handleCuponChange}
+                        className="w-full border rounded-md p-2"
+                      >
+                        <option value="">Seleccionar cupón</option>
+                        {cuponesDisponibles.map((cupon) => (
+                          <option key={cupon.id} value={cupon.id}>
+                            {cupon.descuento}% de descuento
+                          </option>
+                        ))}
+                      </select>
+                      {selectedCupon && (
+                        <button
+                          onClick={handleUsarCupon}
+                          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
                         >
-                          <div className="flex items-center space-x-3">
-                            <input
-                              type="checkbox"
-                              checked={cuponSeleccionado?.id === cupon.id}
-                              onChange={() =>
-                                !cupon.usado && handleAplicarCupon(cupon)
-                              }
-                              disabled={cupon.usado}
-                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                            />
-                            <div>
-                              <p className="text-sm font-medium text-gray-900">
-                                {cupon.porcentaje}% de descuento
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                Código: {cupon.codigo}
-                              </p>
-                            </div>
-                          </div>
-                          <span
-                            className={`px-2 py-1 text-xs font-medium rounded-full ${
-                              cupon.usado
-                                ? "bg-gray-100 text-gray-600"
-                                : "bg-green-100 text-green-800"
-                            }`}
-                          >
-                            {cupon.usado ? "Usado" : "Disponible"}
-                          </span>
-                        </div>
-                      ))}
+                          Aplicar cupón
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}
 
                 {/* Descuento aplicado */}
-                {cuponSeleccionado && (
+                {selectedCupon && (
                   <div className="flex justify-between text-green-600">
-                    <span>Descuento ({cuponSeleccionado.porcentaje}%)</span>
+                    <span>Descuento ({selectedCupon.porcentaje}%)</span>
                     <span>-${calcularDescuento().toFixed(2)}</span>
                   </div>
                 )}
